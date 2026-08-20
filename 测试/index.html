@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>自助核销</title>
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background: #ffffff;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            background: #fff;
+            font-size: 14px;
+            color: #333;
+            z-index: 10;
+        }
+
+        /* 主容器 */
+        .container {
+            margin-top: 44px;
+            padding: 20px;
+        }
+
+        /* 头部信息 */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .user-id {
+            color: #8e8e93;
+            font-size: 15px;
+        }
+
+        /* 洗车券模块 */
+        .coupon-section {
+            width: 96%;
+            margin: 0 auto;
+            height: 80px;
+            border: 1px #ccc solid;
+            display: flex;
+            justify-content: space-around;
+
+
+            align-items: center;
+
+
+            border-radius: 6px;
+
+
+            position: relative;
+        }
+
+
+        .line{
+            position: absolute;
+            width: 20px;
+            height: 80px;
+            background: #1260f4;
+            left: 0;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 25px 0;
+        }
+        .quantity-btn {
+            width: 25px;
+            height: 25px;
+            border-radius: 22px;
+            border: 1px solid #f4f2f5;
+            background: #fff;
+            font-size: 24px;
+            color: black;
+            line-height: 1;
+            background: #f4f2f5;
+        }
+        .quantity-display {
+            font-size: 20px;
+            margin: 0 20px;
+            min-width: 40px;
+            text-align: center;
+
+
+            border: 1px #ccc solid;
+        }
+        .available-text {
+            text-align: center;
+            color: #8e8e93;
+            font-size: 15px;
+        }
+
+        /* 核销选项 */
+        .options-section {
+            margin: 30px 0;
+
+            display: flex;
+            align-items: center;
+        }
+        .options-title {
+            color: #1a1a1a;
+            font-size: 14px;
+            /* margin-bottom: 15px; */
+        }
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .option-item {
+            
+            border: 1px solid #e5e5ea;
+            border-radius: 6px;
+            background: #fff;
+            text-align: center;
+            font-size: 14px;
+            color: #1a1a1a;
+            transition: all 0.2s;
+            width: 60px;
+
+
+            height: 35px;
+            text-align: center;
+
+
+            line-height: 25px;
+        }
+        .option-item.active {
+            border-color: #007aff;
+            /* background: #f2f8ff; */
+            color: #007aff;
+        }
+
+        /* 核销按钮 */
+        .confirm-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 0px;
+            /* right: 20px; */
+            padding: 16px;
+            background: #007aff;
+            color: #fff;
+            border: none;
+            /* border-radius: 25px; */
+            font-size: 17px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <!-- 主内容 -->
+    <div class="container">
+        
+
+        <!-- 洗车券模块 -->
+        <div class="coupon-section">
+
+            <div class="line"></div>
+            <div class="available-text">
+                <p style="color: black;">洗车劵</p>
+                <p>可用：3张</p>  
+            </div>
+            <div class="quantity-control">
+                <button class="quantity-btn">-</button>
+                <span class="quantity-display">1</span>
+                <button class="quantity-btn">+</button>
+            </div>
+            
+        </div>
+
+        <!-- 核销选项 -->
+        <div class="options-section">
+            <h3 class="options-title">核销张数：</h3>
+            <div class="option-grid">
+                <button class="option-item active">1张</button>
+                <button class="option-item active">2张</button>
+                <button class="option-item active">3张</button>
+                <button class="option-item">5张</button>
+            </div>
+        </div>
+
+        <!-- 核销按钮 -->
+        <button class="confirm-btn">自助核销</button>
+    </div>
+
+    <script>
+        // 交互功能实现
+        document.addEventListener('DOMContentLoaded', () => {
+            // 数量增减功能
+            const quantityDisplay = document.querySelector('.quantity-display');
+            const minusBtn = document.querySelector('.quantity-btn:first-child');
+            const plusBtn = document.querySelector('.quantity-btn:last-child');
+            let currentQuantity = 1;
+            const maxQuantity = 3;
+
+            minusBtn.addEventListener('click', () => {
+                if(currentQuantity > 1) {
+                    currentQuantity--;
+                    updateQuantity();
+                }
+            });
+
+            plusBtn.addEventListener('click', () => {
+                if(currentQuantity < maxQuantity) {
+                    currentQuantity++;
+                    updateQuantity();
+                }
+            });
+
+            function updateQuantity() {
+                quantityDisplay.textContent = currentQuantity;
+            }
+
+            // 选项选择功能
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.option-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // 核销按钮点击
+            document.querySelector('.confirm-btn').addEventListener('click', () => {
+                // 存储核销数量到localStorage
+                localStorage.setItem('核销数量', currentQuantity);
+                // 跳转到核销成功页面
+                window.location.href = 'index2.html';
+            });
+        });
+    </script>
+</body>
+</html>
